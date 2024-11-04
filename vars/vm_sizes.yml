@@ -1,0 +1,31 @@
+azuresizes:
+    Standard_F1s:
+          cpu: 1
+          ram: 2048MB
+    Standard_F2s:
+          cpu: 2
+          ram: 4096MB
+    Standard_F4s:
+          cpu: 4
+          ram: 8192MB
+    Standard_F8s:
+          cpu: 8
+          ram: 16384MB
+    Standard_F16s:
+          cpu: 16
+          ram: 32768MB
+    Standard_B1ms:
+          cpu: 1
+          ram: 2048MB
+    Standard_B2ms:
+          cpu: 2
+          ram: 8192MB
+    Standard_B4ms:
+          cpu: 4
+          ram: 16384MB
+    Standard_B8ms:
+          cpu: 8
+          ram: 32768MB
+    Standard_B2s:
+          cpu: 2
+          ram: 4096MB

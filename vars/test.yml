@@ -1,0 +1,19 @@
+vmname: "ANSIBLE_TEST" # {{ env }}"
+generation: 1
+cpu: 4
+cpu_reserve: 0
+cpu_maximum: 100
+cpu_relative_wg: 100
+memory: 4096MB
+ram: 1024MB
+ram_dynamic: false
+ram_minimum: 1GB
+ram_maximum: 8GB
+ram_priority: 80
+ram_buffer: 25
+network_switch: "Virtual Switch" 
+src_vhd: "E:\\Library\\VHDX\\Ubuntu22.04LTS.vhdx"
+dest_path: "E:\\Hyper-V\\{{ vmname }}\\"
+dest_vhd: "{{ dest_path }}{{ vmname }}.vhdx"
+vm_path: "{{ dest_path }}"
+

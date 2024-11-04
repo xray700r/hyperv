@@ -1,0 +1,3 @@
+env: test # Default VM environment this will specify the vars yml file
+deployment: deploy # Deployment environment variables for VM
+production: prod # Deployment to production variables for VM
