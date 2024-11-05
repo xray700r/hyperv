@@ -15,7 +15,7 @@ steps:
   displayName: 'install ansible galaxy if not installed'
   inputs:
     targetType: inline
-    script: >-
+    script: >
       sudo apt-get update
 
       sudo apt-get install python3-pip git libffi-dev libssl-dev -y
