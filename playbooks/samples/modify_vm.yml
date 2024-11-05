@@ -1,0 +1,86 @@
+---
+
+- name: Manage Hyper-V and modify VM's
+  hosts: all
+  gather_facts: True
+  vars:
+    sizeofvm: "{{ vmsize }}"
+  tasks:
+    - name: Include VM environment variables
+      include_vars:
+        file: "test.yml"
+    - name: Include VM standard size variables
+      include_vars:
+        file: "vm_sizes.yml"
+    - name: VM sizes listing
+      debug:
+        msg: "Size {{ item.key }} RAM {{ item.value.ram }} CPU {{ item.value.cpu }}"
+      loop: "{{ azuresizes | dict2items }}"
+    - name: Run RAM script
+      win_shell: "'$(( Foreach-Object { [Math]::Round(($(Get-VM -Name {{ vmname }} | Select-Object -ExpandProperty MemoryStartup) / 1MB), 2) } ) -as [double])MB'"
+      register: resultRAM
+    - name: Process powershell output and set resultRAM
+      set_fact:
+        statusofvmRAM: "{{ resultRAM.stdout_lines[0] }}"
+    - name: Run CPU script
+      win_shell: "Get-VM -Name {{ vmname }} | Select-Object -ExpandProperty ProcessorCount"
+      register: resultCPU
+    - name: Process powershell output and set resultCPU
+      set_fact:
+        statusofvmCPU: "{{ resultCPU.stdout_lines[0] }}"
+    - name: Run Version script
+      win_shell: "Get-VM -Name {{ vmname }} | Select-Object -ExpandProperty Version"
+      register: resultVersion
+    - name: Process powershell output and set resultVersion
+      set_fact:
+        statusofvmVersion: "{{ resultVersion.stdout_lines[0] }}"
+    - name: Set ram size
+      set_fact:
+        ramsize: "{{ azuresizes[sizeofvm]['ram'] }}"
+    - name: Set cpu size
+      set_fact:
+        cpusize: "{{ azuresizes[sizeofvm]['cpu'] }}"
+    - name: Modify VM if not of the required size
+      block:
+        - name: Run status script
+          win_shell: "Get-VM -Name {{ vmname }} | Select-Object -ExpandProperty State"
+          register: resultofpowsh
+        - name: Process powershell output and set state
+          set_fact:
+            statusofvm: "{{ resultofpowsh.stdout_lines[0] }}"
+        - name: Stop VM if Running
+          block:
+            - name: Stop VM if originally Running
+              win_hyperv_guest:
+                name: "{{ vmname }}"
+                state: stopped
+          when: ( statusofvm == "Running" )
+        - name: Modify RAM provisioning for VM
+          win_hyperv_guest:
+            name: "{{ vmname }}"
+            ram: "{{ ramsize }}"
+            ram_dynamic: "{{ ram_dynamic }}"
+            ram_minimum: "{{ ram_minimum }}"
+            ram_maximum: "{{ ram_maximum }}"
+            ram_priority: "{{ ram_priority }}"
+            ram_buffer: "{{ ram_buffer }}"
+            state: memorymod          
+        - name: Modify CPU provisioning for VM
+          win_hyperv_guest:
+            name: "{{ vmname }}"
+            cpu: "{{ cpusize }}"
+            cpu_reserve: "{{ cpu_reserve }}"
+            cpu_maximum: "{{ cpu_maximum }}"
+            cpu_relative_wg: "{{ cpu_relative_wg }}"
+            state: provisioned
+        - name: Start VM if originally Running
+          block:
+            - name: Start VM if originally Running
+              win_hyperv_guest:
+                name: "{{ vmname }}"
+                state: started
+          when: ( statusofvm == "Running" )
+      when: ( statusofvmRAM != ramsize) and (statusofvmCPU != cpusize)
+
+
+

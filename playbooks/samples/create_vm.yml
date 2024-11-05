@@ -1,0 +1,75 @@
+---
+
+- name: Manage Hyper-V and create VM's
+  hosts: all
+  tasks:
+    - name: Include VM environment variables
+      include_vars:
+        file: "{{env}}.yml"
+    - name: Check if source VHDX already exists
+      win_stat:
+        path: "{{ src_vhd }}"
+        get_checksum: false      
+      register: file_info
+    - name: Check VM for MAC address existence if exists do not create VM
+      win_hyperv_guest:
+        name: "{{ vmname }}"
+        state: connected
+      register: vmexisting
+    - name: Initiate default MAC address to "AAAAAAAAAAAA"
+      set_fact:
+        macaddress: "AAAAAAAAAAAA"
+    - name: set variable firstboot
+      set_fact:
+        firstboot: "notbooted"
+#    - name: Debug output vmexisting     
+#      debug:
+#        var: firstboot
+#        verbosity: 2
+    - name: Create VM task block
+      block:
+        - name: Check if destination DIR already exists if not create
+          win_file:
+            path: "{{ dest_path }}"
+            state: directory
+          register: file_info
+        - name: Copy VHDX 
+          win_copy:
+            src: "{{ src_vhd }}"
+            dest: "{{ dest_vhd }}"
+            remote_src: True
+          
+        - name: Create VM
+          win_hyperv_guest:
+            name: "{{ vmname }}"
+            generation: "{{ generation }}"
+            memory: "{{ memory }}"
+            network_switch: "{{ network_switch }}"
+            diskpath: "{{ dest_vhd }}"
+            vmpath: "{{ vm_path }}"
+            state: present
+          
+        - name: Modify CPU provisioning for VM
+          win_hyperv_guest:
+            name: "{{ vmname }}"
+            cpu: "{{ cpu }}"
+            cpu_reserve: "{{ cpu_reserve }}"
+            cpu_maximum: "{{ cpu_maximum }}"
+            cpu_relative_wg: "{{ cpu_relative_wg }}"
+            state: provisioned
+        - name: Start VM
+          win_hyperv_guest:
+            name: "{{ vmname }}"
+            state: started
+
+        - name: Get effective MAC address of the VM from Hyper-V
+          win_shell: "Get-VM {{ vmname }} | Get-VMNetworkAdapter | select -ExpandProperty MacAddress"
+          register: result_mac
+
+        - name: Process powershell output and set MAC address variable
+          set_fact:
+            macaddress: "{{ result_mac.stdout_lines[0] }}"
+        - name: set variable firstboot
+          set_fact:
+            firstboot: "firstboot"
+      when: ( vmexisting.changed == "vmnotexisting" )

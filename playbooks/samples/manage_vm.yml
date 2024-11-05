@@ -1,0 +1,19 @@
+- name: Manage Hyper-V and create VM's
+  hosts: all
+  tasks:
+    - name: Include VM environment variables
+      include_vars:
+        file: "{{ inventory_hostname }}_vmstatus.yml"
+#    - name: Debug output inventory_hostname
+#      debug: var={{ inventory_hostname }}
+    - name: Stop VM
+      win_hyperv_guest:
+        name: "{{ item }}"
+        state: stopped
+      loop: "{{ vmstopped }}"
+    - name: Start VM
+      win_hyperv_guest:
+        name: "{{ item }}"
+        state: started
+      loop: "{{ vmstarted }}"
+

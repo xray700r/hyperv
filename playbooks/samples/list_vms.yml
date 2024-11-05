@@ -1,0 +1,23 @@
+---
+- name: List Hyper-V VM
+  hosts: all
+  tasks:
+    - name: Copy script file for VM listing
+      win_copy:
+        src: "/home/ansibleagent/playbooks/virtualization/scripts/listhvstatus.ps1"
+        dest: "C:\\Scripts\\"
+        remote_src: False
+    - name: Run listing script
+      win_shell: "C:\\Scripts\\listhvstatus.ps1"
+      args:
+        chdir: "C:\\Scripts\\"
+      register: resultofpowsh
+    - name: Debug output ps1     
+      debug:
+        var: resultofpowsh
+        verbosity: 2
+    - name: Fetch status files
+      ansible.builtin.fetch:
+        src: "C:\\Scripts\\HVstatus\\{{ inventory_hostname }}_vmstatus.yml"
+        dest: "/home/ansibleagent/playbooks/virtualization/vars/"
+        flat: yes

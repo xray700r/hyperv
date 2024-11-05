@@ -1,0 +1,30 @@
+---
+- name: Manage Hyper-V and standardize VM's
+  hosts: all
+  gather_facts: True
+  vars:
+    sizeofvm: "{{ vmsize }}"
+  tasks:
+    - name: Include VM size variables
+      include_vars:
+        file: "{{ inventory_hostname }}_vmsize.yml"
+    - name: Include VM environment variables
+      include_vars:
+        file: "test.yml"
+    - name: Include VM standard size variables
+      include_vars:
+        file: "vm_sizes.yml"
+    - name: VM sizes listing
+      debug:
+        msg: "Size {{ item.key }} RAM {{ item.value.ram }} CPU {{ item.value.cpu }}"
+      loop: "{{ azuresizes | dict2items }}"
+    - name: VM sizes to apply
+      debug:
+        msg: "VM {{ item.key }} Size {{ item.value.Azuresize }} HyperVHost {{ item.value.HVhost }}"
+      loop: "{{ vmmlist | dict2items }}"
+    - name: Loop VMs on size list
+      include_tasks: "modify_vm_tasks.yml"
+      vars:
+          vmname: "{{ item.key }}"
+          vmsize: "{{ item.value.Azuresize }}"
+      loop: "{{ vmmlist | dict2items }}"
