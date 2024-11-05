@@ -17,7 +17,9 @@ steps:
     targetType: inline
     script: >-
       apt-get update
+
       apt-get install python3-pip git libffi-dev libssl-dev -y
+      
       pip install ansible pywinrm
 
     noProfile: true
