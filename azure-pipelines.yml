@@ -20,7 +20,7 @@ steps:
 
       sudo apt-get install python3-pip git libffi-dev libssl-dev -y
       
-      pip install ansible pywinrm
+      sudo apt-get install ansible pywinrm
 
     noProfile: true
     noRc: true
