@@ -18,7 +18,7 @@ steps:
     script: >-
       apt-get update
       apt-get install python3-pip git libffi-dev libssl-dev -y
-      pip install --user ansible pywinrm
+      pip install ansible pywinrm
 
     noProfile: true
     noRc: true
