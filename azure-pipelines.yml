@@ -48,7 +48,7 @@ steps:
         ansible-galaxy collection build
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/xray700r-hyperv*.tar.gz'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/*.tar.gz'
     ArtifactName: 'xray700r-hyperv'
     publishLocation: 'Container'
     failOnStderr: true
