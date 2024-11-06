@@ -34,3 +34,11 @@ steps:
       sudo -H pip3 install pywinrm
 
     failOnStderr: true
+- task: Bash@3
+  displayName: 'Install ansible galaxy and deps if not installed'
+  inputs:
+    targetType: inline
+    workingDirectory: '$(Build.SourcesDirectory)'
+    script: >-
+        ansible-galaxy collection build
+    failOnStderr: true
