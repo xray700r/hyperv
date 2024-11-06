@@ -11,12 +11,21 @@ pool:
 
 steps:
 - checkout: self
+  clean: true
+  fetchTags: false
 - task: Bash@3
-  displayName: 'install ansible galaxy if not installed'
+  displayName: 'apt update'
+  continueOnError: True
   inputs:
     targetType: inline
     script: >-
       sudo apt-get update
+    failOnStderr: false
+- task: Bash@3
+  displayName: 'Install ansible galaxy and deps if not installed'
+  inputs:
+    targetType: inline
+    script: >-
 
       sudo apt-get install python3-pip git libffi-dev libssl-dev -y
       
