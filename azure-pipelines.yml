@@ -22,6 +22,6 @@ steps:
       
       sudo apt-get install ansible -y
 
-      pip3 install pywinrm
-      
+      sudo -H pip3 install pywinrm
+
     failOnStderr: true
