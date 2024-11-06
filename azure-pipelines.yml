@@ -34,11 +34,29 @@ steps:
       sudo -H pip3 install pywinrm
 
     failOnStderr: true
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
+    OverWrite: true
 - task: Bash@3
-  displayName: 'Install ansible galaxy and deps if not installed'
+  displayName: 'Build ansible galaxy collection'
   inputs:
     targetType: inline
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
     script: >-
         ansible-galaxy collection build
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/xray700r-hyperv*.tar.gz'
+    ArtifactName: 'xray700r-hyperv'
+    publishLocation: 'Container'
     failOnStderr: true
+
+- task: DeleteFiles@1
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: '**/**'
+    RemoveDotFiles: true
