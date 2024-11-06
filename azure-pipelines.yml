@@ -54,7 +54,17 @@ steps:
     ArtifactName: 'xray700r-hyperv'
     publishLocation: 'Container'
     failOnStderr: true
+- task: Bash@3
+  displayName: 'Publish to ansible galaxy namespace'
+  inputs:
+    targetType: inline
+    script: >-
 
+        tarfile=$(find . -type f -name 'xray700r-hyperv-*.tar.gz' -exec basename {} ';')
+        
+        ansible-galaxy collection publish ./$tarfile --api-key $(GalaxyApiKeyHyperv)
+
+    failOnStderr: true
 - task: DeleteFiles@1
   inputs:
     SourceFolder: '$(Build.ArtifactStagingDirectory)'
