@@ -20,5 +20,5 @@ steps:
 
       sudo apt-get install python3-pip git libffi-dev libssl-dev -y
       
-      sudo apt-get install ansible pywinrm
+      sudo apt-get install ansible pywinrm -y
     failOnStderr: true
