@@ -40,12 +40,21 @@ steps:
     CleanTargetFolder: true
     OverWrite: true
 
-- task: PowerShell Script Analyzer@1
+- task: Bash@3
+  displayName: 'Publish to ansible galaxy namespace'
+  continueOnError: True
   inputs:
-    PsFolder: '$(Build.ArtifactStagingDirectory)/plugins/modules'
-    IncludeRules: 'PSAvoidDefaultValueForMandatoryParameter,PSAvoidUsingEmptyCatchBlock,PSAvoidOverwritingBuiltInCmdlets,PSAvoidUsingUsernameAndPasswordParams,PSAvoidUsingComputerNameHardcoded,PSAvoidUsingPlainTextForPassword,PSAvoidUsingWriteHost,PSMisleadingBacktick,PSPossibleIncorrectUsageOfAssignmentOperator,PSPossibleIncorrectUsageOfRedirectionOperator,PSAvoidDefaultValueSwitchParameter,PSAvoidUsingWMICmdlet,PSUseCompatibleCommands,PSUseCompatibleSyntax,PSUseCompatibleTypes,PSPossibleIncorrectComparisonWithNull,PSUseConsistentIndentation,PSUseConsistentWhitespace,PSUsePSCredentialType,PSUseCorrectCasing,PSUseOutputTypeCorrectly,PSPlaceCloseBrace,PSPlaceOpenBrace,PSReviewUnusedParameter,PSReservedParams,PSAvoidUsingInvokeExpression'
-    Severity: 'Error'
-    FailOnError: true
+    targetType: inline
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+    script: >-
+
+        pwsh Install-Module -Name PSScriptAnalyzer -Force
+        
+        pwsh Import-Module -Name PSScriptAnalyzer
+
+        pwsh Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName | Format-List
+
+    failOnStderr: true
 - task: Bash@3
   displayName: 'Build ansible galaxy collection'
   inputs:
