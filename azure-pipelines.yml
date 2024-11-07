@@ -64,6 +64,7 @@ steps:
   continueOnError: True
   inputs:
     targetType: inline
+    workingDirectory: '$(Build.BinariesDirectory)'
     script: >-
 
         tarfile=$(find . -type f -name 'xray700r-hyperv-*.tar.gz' -exec basename {} ';')
