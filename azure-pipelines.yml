@@ -46,9 +46,16 @@ steps:
     workingDirectory: '$(Build.ArtifactStagingDirectory)'
     script: >-
         ansible-galaxy collection build
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: '*.tar.gz'
+    TargetFolder: '$(Build.BinariesDirectory)'
+    CleanTargetFolder: true
+    OverWrite: true
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/*.tar.gz'
+    PathtoPublish: '$(Build.BinariesDirectory)'
     ArtifactName: 'xray700r-hyperv'
     publishLocation: 'Container'
     failOnStderr: true
