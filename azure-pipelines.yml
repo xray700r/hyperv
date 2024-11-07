@@ -55,6 +55,22 @@ steps:
         pwsh -Command "$analysis=$(Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName); Write-Output $analysis | Format-List; $errors = $($analysis | Select-String -Pattern 'Error' -CaseSensitive -SimpleMatch); if (-not [string]::IsNullOrEmpty($errors)){Write-Error "Error in detection rules for PSSCript Analyzer! The validation has failed!"}"
 
     failOnStderr: true
+
+- task: Bash@3
+  displayName: 'Analyze with Injection Hunter'
+  continueOnError: True
+  inputs:
+    targetType: inline
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+    script: >-
+
+        pwsh -Command "Install-Module -Name InjectionHunter -Force"
+        
+        pwsh -Command "Import-Module -Name InjectionHunter"
+
+        pwsh -Command "$injectionanalysis=$(Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 -CustomRulePath (Get-Module InjectionHunter -List | % Path) -v; $injectionanalysis | Format-List;"
+
+    failOnStderr: true
 - task: Bash@3
   displayName: 'Build ansible galaxy collection'
   inputs:
