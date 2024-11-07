@@ -41,7 +41,7 @@ steps:
     OverWrite: true
 
 - task: Bash@3
-  displayName: 'Publish to ansible galaxy namespace'
+  displayName: 'Analyze with PSSCript Analyzer'
   continueOnError: True
   inputs:
     targetType: inline
