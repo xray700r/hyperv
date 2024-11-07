@@ -88,7 +88,7 @@ Function VM-Create {
     #Check If the VM already exists
     $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue
 
-    if (!$CheckVM) {
+    if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "New-VM -Name $name -BootDevice VHD"
 
         if ($memory) {
@@ -133,7 +133,7 @@ Function VM-Create {
 Function VM-Delete {
     $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue
 
-    if ($CheckVM) {
+    if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Remove-VM -Name $name -Force"
         $results = invoke-expression $cmd
         $result.changed = $true
@@ -169,7 +169,7 @@ Function VM-Start {
 Function VM-Shutdown {
     $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" }
 
-    if ($CheckVM) {
+    if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Stop-VM -Name $name"
         $results = invoke-expression $cmd
         $result.changed = $true
@@ -182,7 +182,7 @@ Function VM-Shutdown {
 Function VM-NetConn {
     $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" }
     
-    if ($CheckVM) {
+    if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Get-VM $name | Get-VMNetworkAdapter | select -ExpandProperty MacAddress"
         $results = invoke-expression $cmd
         if ($results -eq "000000000000") {
@@ -199,7 +199,7 @@ Function VM-NetConn {
 Function VM-ModCPU {
     $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" }
 
-    if ($CheckVM) {
+    if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Set-VMProcessor $name"
         if ($cpu) {
             #If cpu number is not null
@@ -233,7 +233,7 @@ Function VM-ModCPU {
 Function VM-ModRAM {
     $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" }
     
-    if ($CheckVM) {
+    if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Set-VMMemory $name"
         if ($ram) {
             #If cpu number is not null
