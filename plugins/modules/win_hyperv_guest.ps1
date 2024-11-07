@@ -69,7 +69,8 @@ function VMRamAvailable($VMname) {
 function VMRemoveSaved($VM_name) {
 
     
-    $snapshotresult = $(Get-VMSnapshot -VMName $VM_name -ErrorAction SilentlyContinue)
+    try { $snapshotresult = $(Get-VMSnapshot -VMName $VM_name -ErrorAction SilentlyContinue) }
+    catch { Write-Warning $PSItem.Exception.Message }
 
     if ($null -ne $snapshotresult) {
 
@@ -86,7 +87,8 @@ function VMRemoveSaved($VM_name) {
 
 Function VM-Create {
     #Check If the VM already exists
-    $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue
+    try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue }
+    catch { Write-Warning $PSItem.Exception.Message }
 
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "New-VM -Name $name -BootDevice VHD"
@@ -131,7 +133,8 @@ Function VM-Create {
 }
 
 Function VM-Delete {
-    $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue
+    try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue }
+    catch { Write-Warning $PSItem.Exception.Message }
 
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Remove-VM -Name $name -Force"
@@ -167,8 +170,10 @@ Function VM-Start {
 }
 
 Function VM-Shutdown {
-    $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" }
-
+    
+    
+    try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" } }
+    catch { Write-Warning $PSItem.Exception.Message }
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Stop-VM -Name $name"
         $results = invoke-expression $cmd
@@ -180,7 +185,10 @@ Function VM-Shutdown {
 }
 
 Function VM-NetConn {
-    $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" }
+
+    try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" } }
+    catch { Write-Warning $PSItem.Exception.Message }
+    
     
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Get-VM $name | Get-VMNetworkAdapter | select -ExpandProperty MacAddress"
@@ -197,8 +205,9 @@ Function VM-NetConn {
 }
 
 Function VM-ModCPU {
-    $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" }
-
+    
+    try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" } }
+    catch { Write-Warning $PSItem.Exception.Message }
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Set-VMProcessor $name"
         if ($cpu) {
@@ -231,8 +240,9 @@ Function VM-ModCPU {
 
 }
 Function VM-ModRAM {
-    $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" }
     
+    try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" } }
+    catch { Write-Warning $PSItem.Exception.Message }
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Set-VMMemory $name"
         if ($ram) {
