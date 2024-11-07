@@ -63,6 +63,7 @@ steps:
   displayName: 'Publish to ansible galaxy namespace'
   inputs:
     targetType: inline
+    workingDirectory: '$(Build.BinariesDirectory)'
     script: >-
 
         tarfile=$(find . -type f -name 'xray700r-hyperv-*.tar.gz' -exec basename {} ';')
@@ -73,5 +74,11 @@ steps:
 - task: DeleteFiles@1
   inputs:
     SourceFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: '**/**'
+    RemoveDotFiles: true
+
+- task: DeleteFiles@1
+  inputs:
+    SourceFolder: '$(Build.BinariesDirectory)'
     Contents: '**/**'
     RemoveDotFiles: true
