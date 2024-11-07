@@ -61,6 +61,7 @@ steps:
     failOnStderr: true
 - task: Bash@3
   displayName: 'Publish to ansible galaxy namespace'
+  continueOnError: True
   inputs:
     targetType: inline
     script: >-
@@ -69,7 +70,7 @@ steps:
         
         ansible-galaxy collection publish ./$tarfile --api-key $(GalaxyApiKeyHyperv)
 
-    failOnStderr: true
+    failOnStderr: false
 - task: DeleteFiles@1
   inputs:
     SourceFolder: '$(Build.ArtifactStagingDirectory)'
