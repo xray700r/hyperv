@@ -39,6 +39,13 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     CleanTargetFolder: true
     OverWrite: true
+
+- task: PowerShell Script Analyzer@1
+  inputs:
+    PsFolder: '$(Build.ArtifactStagingDirectory)/plugins/modules'
+    IncludeRules: 'PSAvoidDefaultValueForMandatoryParameter,PSAvoidUsingEmptyCatchBlock,PSAvoidOverwritingBuiltInCmdlets,PSAvoidUsingUsernameAndPasswordParams,PSAvoidUsingComputerNameHardcoded,PSAvoidUsingPlainTextForPassword,PSAvoidUsingWriteHost,PSMisleadingBacktick,PSPossibleIncorrectUsageOfAssignmentOperator,PSPossibleIncorrectUsageOfRedirectionOperator,PSAvoidDefaultValueSwitchParameter,PSAvoidUsingWMICmdlet,PSUseCompatibleCommands,PSUseCompatibleSyntax,PSUseCompatibleTypes,PSPossibleIncorrectComparisonWithNull,PSUseConsistentIndentation,PSUseConsistentWhitespace,PSUsePSCredentialType,PSUseCorrectCasing,PSUseOutputTypeCorrectly,PSPlaceCloseBrace,PSPlaceOpenBrace,PSReviewUnusedParameter,PSReservedParams,PSAvoidUsingInvokeExpression'
+    Severity: 'Error'
+    FailOnError: true
 - task: Bash@3
   displayName: 'Build ansible galaxy collection'
   inputs:
