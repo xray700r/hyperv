@@ -56,7 +56,7 @@
             cpu_reserve: "{{ cpu_reserve }}"
             cpu_maximum: "{{ cpu_maximum }}"
             cpu_relative_wg: "{{ cpu_relative_wg }}"
-            state: provisioned
+            state: cpumod
         - name: Start VM
           win_hyperv_guest:
             name: "{{ vmname }}"

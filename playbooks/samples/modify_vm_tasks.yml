@@ -61,7 +61,7 @@
         cpu_reserve: "{{ cpu_reserve }}"
         cpu_maximum: "{{ cpu_maximum }}"
         cpu_relative_wg: "{{ cpu_relative_wg }}"
-        state: provisioned
+        state: cpumod
     - name: Start VM if originally Running
       block:
         - name: Start VM if originally Running

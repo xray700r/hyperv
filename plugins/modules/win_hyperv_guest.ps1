@@ -85,35 +85,35 @@ function VMRemoveSaved($VM_name) {
 
 }
 
-Function VM-Create {
+Function VM-Create($name,$memory,$hostserver,$generation,$network_switch,$vmpath,$diskpath) {
     #Check If the VM already exists
     try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue }
     catch { Write-Warning $PSItem.Exception.Message }
 
-    if (-not [string]::IsNullOrEmpty($CheckVM)) {
+    if ([string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "New-VM -Name $name -BootDevice VHD"
 
-        if ($memory) {
+        if (-not [string]::IsNullOrEmpty($memory)) {
             $cmd += " -MemoryStartupBytes $memory"
         }
 
-        if ($hostserver) {
+        if (-not [string]::IsNullOrEmpty($hostserver)) {
             $cmd += " -ComputerName $hostserver"
         }
 
-        if ($generation) {
+        if (-not [string]::IsNullOrEmpty($generation)) {
             $cmd += " -Generation $generation"
         }
 
-        if ($network_switch) {
+        if (-not [string]::IsNullOrEmpty($network_switch)) {
             $cmd += " -SwitchName '$network_switch'"
         }
 
-        if ($vmpath) {
+        if (-not [string]::IsNullOrEmpty($vmpath)) {
             $cmd += " -Path $vmpath"
         }
         
-        if ($diskpath) {
+        if (-not [string]::IsNullOrEmpty($diskpath)) {
             #If VHD already exists then attach it, if not create it
             if (Test-Path $diskpath) {
                 $cmd += " -VHDPath '$diskpath'"
@@ -132,7 +132,7 @@ Function VM-Create {
     }
 }
 
-Function VM-Delete {
+Function VM-Delete($name) {
     try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue }
     catch { Write-Warning $PSItem.Exception.Message }
 
@@ -146,7 +146,7 @@ Function VM-Delete {
     }
 }
 
-Function VM-Start {
+Function VM-Start($name) {
     $CheckVMstarted = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Running" }
     $CheckVMstopped = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" }
     $CheckVMsaved = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Saved" }
@@ -169,7 +169,7 @@ Function VM-Start {
     }
 }
 
-Function VM-Shutdown {
+Function VM-Shutdown($name) {
     
     
     try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" } }
@@ -184,7 +184,7 @@ Function VM-Shutdown {
     }
 }
 
-Function VM-NetConn {
+Function VM-NetConn($name){
 
     try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" -or $_.State -eq "Running" } }
     catch { Write-Warning $PSItem.Exception.Message }
@@ -204,7 +204,7 @@ Function VM-NetConn {
     }
 }
 
-Function VM-ModCPU {
+Function VM-ModCPU($name,$cpu,$cpu_maximum,$cpu_reserve,$cpu_relative_wg) {
     
     try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" } }
     catch { Write-Warning $PSItem.Exception.Message }
@@ -213,19 +213,19 @@ Function VM-ModCPU {
         if ($cpu) {
             #If cpu number is not null
 
-            if ($cpu) {
+            if (-not [string]::IsNullOrEmpty($cpu)) {
                 $cmd += " -Count $cpu"
             }
     
-            if ($cpu_maximum) {
+            if (-not [string]::IsNullOrEmpty($cpu_maximum)) {
                 $cmd += " -Maximum $cpu_maximum"
             }
     
-            if ($cpu_reserve) {
+            if (-not [string]::IsNullOrEmpty($cpu_reserve)) {
                 $cmd += " -Reserve $cpu_reserve"
             }
     
-            if ($cpu_relative_wg) {
+            if (-not [string]::IsNullOrEmpty($cpu_relative_wg)) {
                 $cmd += " -RelativeWeight $cpu_relative_wg"
             }
             
@@ -239,33 +239,33 @@ Function VM-ModCPU {
     }
 
 }
-Function VM-ModRAM {
+Function VM-ModRAM($name,$ram,$ram_dynamic,$ram_minimum,$ram_maximum,$ram_priority,$ram_buffer) {
     
     try { $CheckVM = Get-VM -name $name -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Off" } }
     catch { Write-Warning $PSItem.Exception.Message }
     if (-not [string]::IsNullOrEmpty($CheckVM)) {
         $cmd = "Set-VMMemory $name"
-        if ($ram) {
-            #If cpu number is not null
+        if (-not [string]::IsNullOrEmpty($ram)) {
+            #If ram quantity is not null
 
-            if ($ram) {
+            if (-not [string]::IsNullOrEmpty($ram)) {
                 $cmd += " -StartupBytes $ram"
             }
     
             if ($true -eq $ram_dynamic) {
                 $cmd += " -DynamicMemoryEnabled $ram_dynamic"            
     
-                if ($ram_minimum) {
+                if (-not [string]::IsNullOrEmpty($ram_minimum)) {
                     $cmd += " -MinimumBytes $ram_minimum"
                 }
     
-                if ($ram_maximum) {
+                if (-not [string]::IsNullOrEmpty($ram_maximum)) {
                     $cmd += " -MaximumBytes $ram_maximum"
                 }
-                if ($ram_priority) {
+                if (-not [string]::IsNullOrEmpty($ram_priority)) {
                     $cmd += " -Priority $ram_priority"
                 }
-                if ($ram_buffer) {
+                if (-not [string]::IsNullOrEmpty($ram_buffer)) {
                     $cmd += " -Buffer $ram_buffer"
                 }
             }
@@ -282,13 +282,13 @@ Function VM-ModRAM {
 
 Try {
     switch ($state) {
-        "present" { VM-Create }
-        "absent" { VM-Delete }
-        "started" { VM-Start }
-        "stopped" { VM-Shutdown }
-        "provisioned" { VM-ModCPU }
-        "connected" { VM-NetConn }
-        "memorymod" { VM-ModRAM }
+        "present" { VM-Create $name $memory $hostserver $generation $network_switch $vmpath $diskpath}
+        "absent" { VM-Delete $name}
+        "started" { VM-Start $name}
+        "stopped" { VM-Shutdown $name}
+        "cpumod" { VM-ModCPU $name $cpu $cpu_maximum $cpu_reserve $cpu_relative_wg}
+        "connected" { VM-NetConn $name}
+        "memorymod" { VM-ModRAM $name $ram $ram_dynamic $ram_minimum $ram_maximum $ram_priority $ram_buffer}
     }
 
     Exit-Json $result;
