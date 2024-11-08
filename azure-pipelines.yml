@@ -52,7 +52,7 @@ steps:
         
         pwsh -Command "Import-Module -Name PSScriptAnalyzer"
 
-        pwsh -Command "$analysis=$(Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName)"
+        pwsh -Command "$analysis\=$(Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName)"
 
     failOnStderr: true
 
