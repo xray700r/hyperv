@@ -52,7 +52,7 @@ steps:
         
         pwsh -Command "Import-Module -Name PSScriptAnalyzer"
 
-        pwsh -Command "Invoke-ScriptAnalyzer -Path ./plugins/modules/ -IncludeRule $(Get-ScriptAnalyzerRule -Severity Error) -Recurse"
+        pwsh -Command "Invoke-ScriptAnalyzer -Path ./plugins/modules/ -Profile ./playbooks/files/PSAnalyzerProfileError.txt -Recurse"
 
     failOnStderr: true
 - task: Bash@3
