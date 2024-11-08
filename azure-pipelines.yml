@@ -41,6 +41,21 @@ steps:
     OverWrite: true
 
 - task: Bash@3
+  displayName: 'Quality Gate with PSSCript Analyzer for Errors '
+  continueOnError: False
+  inputs:
+    targetType: inline
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+    script: >-
+
+        pwsh -Command "Install-Module -Name PSScriptAnalyzer -Force"
+        
+        pwsh -Command "Import-Module -Name PSScriptAnalyzer"
+
+        pwsh -Command "Invoke-ScriptAnalyzer -Path ./plugins/modules/ -IncludeRule $(Get-ScriptAnalyzerRule -Severity Error) -Recurse"
+
+    failOnStderr: true
+- task: Bash@3
   displayName: 'Analyze with PSSCript Analyzer'
   continueOnError: True
   inputs:
@@ -52,7 +67,7 @@ steps:
         
         pwsh -Command "Import-Module -Name PSScriptAnalyzer"
 
-        pwsh -Command "Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName | Format-List"
+        pwsh -Command "Invoke-ScriptAnalyzer ./plugins/modules/ | Select-Object Severity, Line, Message, RuleName | Format-List"
 
     failOnStderr: true
 
@@ -68,7 +83,7 @@ steps:
         
         pwsh -Command "Import-Module -Name InjectionHunter"
 
-        pwsh -Command "Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 -CustomRulePath (Get-Module InjectionHunter -List | % Path) -v | Format-List"
+        pwsh -Command "Invoke-ScriptAnalyzer ./plugins/modules/ -CustomRulePath (Get-Module InjectionHunter -List | % Path) -v | Format-List"
 
     failOnStderr: true
 - task: Bash@3
