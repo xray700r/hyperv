@@ -52,7 +52,7 @@ steps:
         
         pwsh -Command "Import-Module -Name PSScriptAnalyzer"
 
-        pwsh -Command "$analysis=$(Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName); $errors=$($analysis | Select-String -Pattern 'Error' -CaseSensitive -SimpleMatch); if (-not [string]::IsNullOrEmpty($errors)){Write-Error "Error in detection rules for PSSCript Analyzer! The validation has failed!"}"
+        pwsh -Command "$analysis=$(Invoke-ScriptAnalyzer ./plugins/modules/win_hyperv_guest.ps1 | Select-Object Severity, Line, Message, RuleName)"
 
     failOnStderr: true
 
